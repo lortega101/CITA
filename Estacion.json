@@ -1,0 +1,91 @@
+[{
+		"Estacion": "Estacion N 1",
+		"Lat": -11.60648,
+		"Lon": -76.200635
+	},
+	{
+		"Estacion": "Estacion N 4",
+		"Lat": -11.703582,
+		"Lon": -76.269089
+	},
+	{
+		"Estacion": "Estacion N 5",
+		"Lat": -11.75834,
+		"Lon": -76.298811
+	},
+	{
+		"Estacion": "Estacion N 6",
+		"Lat": -11.773548,
+		"Lon": -76.304855
+	},
+	{
+		"Estacion": "Estacion N 8",
+		"Lat": -11.785108,
+		"Lon": -76.310306
+	},
+	{
+		"Estacion": "Estacion N 9",
+		"Lat": -11.80411,
+		"Lon": -76.340558
+	},
+	{
+		"Estacion": "Estacion N 10",
+		"Lat": -11.885586,
+		"Lon": -76.447333
+	},
+	{
+		"Estacion": "Estacion N 11",
+		"Lat": -11.922817,
+		"Lon": -76.662559
+	},
+	{
+		"Estacion": "Estacion N 19",
+		"Lat": -12.041319,
+		"Lon": -77.034045
+	},
+	{
+		"Estacion": "Estacion N 20",
+		"Lat": -12.034906,
+		"Lon": -77.065577
+	},
+	{
+		"Estacion": "Estacion N 21",
+		"Lat": -12.037956,
+		"Lon": -77.09062
+	},
+	{
+		"Estacion": "Estacion N 22",
+		"Lat": -12.039611,
+		"Lon": -77.099273
+	},
+	{
+		"Estacion": "Estacion N 22A",
+		"Lat": -12.039763,
+		"Lon": -77.116042
+	},
+	{
+		"Estacion": "Estacion N 23",
+		"Lat": -12.036694,
+		"Lon": -77.127438
+	},
+	{
+		"Estacion": "Estacion N 14",
+		"Lat": -11.93951,
+		"Lon": -76.696612
+	},
+	{
+		"Estacion": "Estacion N 15",
+		"Lat": -11.977338,
+		"Lon": -76.784884
+	},
+	{
+		"Estacion": "Estacion N 16",
+		"Lat": -12.018459,
+		"Lon": -76.910759
+	},
+	{
+		"Estacion": "Estacion N 18",
+		"Lat": -12.026969,
+		"Lon": -76.992929
+	}
+]
