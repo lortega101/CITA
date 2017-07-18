@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8"/>
+  <head>
+    <title>Mapa de Peru</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.2.0/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.2.0/build/ol.js"></script>
+    <script src="https://openlayers.org/en/v4.2.0/examples/resources/mapbox-streets-v6-style.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.38.0/mapbox-gl.js'></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet"> 
+    
+
+    <style>
+      .map {
+        background: #f8f4f0;
+        font-family: 'Abel';
+      }
+      .popover-content {
+        max-height:420px;
+        min-width: 270px;
+        font-family: 'Abel';
+      }
+      .body {
+        font-family: 'Abel', serif;
+      }
+      
+
+      td {
+        padding: 5px;
+      }
+      
+      #cita{
+          /* Logo de Cita */
+          position: fixed;
+          bottom: 10px;
+          left: 10px;
+          z-index: 1;
+          padding: 0px;
+          margin: 0px;
+      }
+      #utec{
+          /* Logo de UTEC */
+          position: fixed;
+          bottom: 10px;
+          left: 170px;
+          z-index: 1;
+          padding: 0px;
+          margin: 0px;
+      }
+       /* Container con instrucciones de como leer la data */
+      .container {
+      width: 250px;
+      height: 450px;
+      border: 5px solid #4dd9ff;
+      position: fixed;
+      bottom: 60px;
+      left: 0px;
+      border-radius: 25px;
+      font-family: 'Roboto', sans-serif;
+      background-color: #ffffff;
+      line-height: 1.7;
+      }  
+    
+
+      h1 {
+      font-size: 25px;
+      font-weight: normal;
+      color:#1481ba;
+      text-align: center;
+      font-family: 'Abel', serif;
+      }
+      
+      ul {
+      list-style-type: circle;
+      margin: 5;
+      padding: 10px;
+      }  
+    
+    </style>
+    
+    
+  </head>
+  <body>
+      
+    <div id="map" class="map"></div>
+    <div id="popup" class="ol-popup">
+       
+    </div>
+    
+    
+    <div id="hidden">
+      <header>
+        <h1>Estación</h1>
+      </header>
+      <p>
+        <table class="display"  width="100%">
+        <tr>
+         <td>Estación</td>
+         <td> <div id = "test">  </div></td>
+       </tr>
+       
+       <tr>
+         <td>Descripción</td>
+         <td><div id = "test1"> </div></td>
+       </tr>
+       
+        <tr>
+         <td>Frequencia de Medición</td>
+         <td><div id = "test2"> Annual </div></td>
+       </tr>
+       
+       <tr>
+         <td>Parametros Medidos</td>
+         <td><div id = "test3"> -Coliformes <br /> -Plomo </div></td>
+       </tr>
+       
+       <tr>
+         <td>Fuente</td>
+         <td><div id = "test3"> Perú: Anuario de Estadísticas Ambientales 2015 </div></td>
+       </tr>
+       
+       </table>
+      </p>
+      <footer style="color:#2471a3;">
+        <p>Ver Datos</p>
+      </footer> 
+      <footer style="color:#C70039;">
+        <p>Descargar Datos</p>
+      </footer> 
+    </div>
+    
+    <div class="container">
+      <header>
+   <h1>Mapa de calidad del agua de Peru</h1>
+      </header>
+      <p>Esta herramienta es para el monitoreo de la calidad de agua en Perú. Cada estación contiene los próximos tipos de datos:</p>
+      <p>
+        <ul class="a">
+          <li>Numero de Estación</li>
+          <li>Dirección de Estacion</li>
+          <li>Tipos de parametros medidos y frecuencia de medición</li>
+          <li>Fuente de Datos</li>
+        </ul>
+      </p>
+
+    </div>
+    
+    <img src="CITA.png"  height="42" width="128" id="cita"> 
+    <img src="UTEC.png"  height="33" width="80" id="utec">
+    
+    <script>
+      /* eslint-disable openlayers-internal/no-unused-requires */
+      // llave para poder usar los servicios de Mapbox
+      var key = 'pk.eyJ1IjoibG9ydGVnYTEwMSIsImEiOiJjajRzbGpmaWUwenJhMndxaGNxaGliOTI0In0.IcnrKjndAohsB6cOKrkiZQ';
+
+      // La coputacion de la resolución de la mapa en cada nivel de zoom 1, 3, 5, 7, 9, 11, 13, 15.
+      var resolutions = [];
+      for (var i = 0; i <= 7; ++i) {
+        resolutions.push(156543.03392804097 / Math.pow(2, i * 2));
+      }
+      // Computacion de tile urls para nivel de zoom 1, 3, 5, 7, 9, 11, 13, 15.
+      function tileUrlFunction(tileCoord) {
+        return ('https://{a-d}.tiles.mapbox.com/v4/mapbox.mapbox-streets-v6/' +
+            '{z}/{x}/{y}.vector.pbf?access_token=' + key)
+            .replace('{z}', String(tileCoord[0] * 2 - 1))
+            .replace('{x}', String(tileCoord[1]))
+            .replace('{y}', String(-tileCoord[2] - 1))
+            .replace('{a-d}', 'abcd'.substr(
+                ((tileCoord[1] << tileCoord[0]) + tileCoord[2]) % 4, 1));
+      }
+      // formato de EPSG: 3857 
+      // formato compatible con Google Maps
+      var formatlayer = new ol.layer.VectorTile({
+            source: new ol.source.VectorTile({
+              attributions: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> ' +
+                '© <a href="https://www.openstreetmap.org/copyright">' +
+                'OpenStreetMap contributors</a>',
+              format: new ol.format.MVT(),
+              tileGrid: new ol.tilegrid.TileGrid({
+                extent: ol.proj.get('EPSG:3857').getExtent(),
+                resolutions: resolutions,
+                tileSize: 512
+              }),
+              tilePixelRatio: 8,
+              tileUrlFunction: tileUrlFunction
+            }),
+            
+            style: createMapboxStreetsV6Style()
+          });
+
+      // informacion del pop up   
+      var iconFeature = new ol.Feature({
+        // lat and lon need to be imported from SQL chart from columns LAT and LON
+        // stationname will be from ESTACION
+        // description will be from DESCRIPCION
+        geometry: new ol.geom.Point(ol.proj.transform([-76.200635, -11.60648], 'EPSG:4326', 'EPSG:3857')),
+        stationname: 'Estación Nº 1',
+        description: 'Río Rímac, bocatoma laguna Ticticocha, C.C. km. 127. Chicla-Huarochirí',
+        datatype: 'coliformes',
+        coordinates: 500
+      });
+      // estilo del pop up
+      var iconStyle = new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          anchor: [0.5, 25],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          src: 'map-marker-icon.png',
+          scale:.02
+        }))
+      });
+      
+      iconFeature.setStyle(iconStyle);
+
+      var vectorSource = new ol.source.Vector({
+        features: [iconFeature]
+      });
+
+      var vectorLayer = new ol.layer.Vector({
+        source: vectorSource
+      });
+
+      // poner la mapa en la pagina
+      var map = new ol.Map({
+        layers: [formatlayer, vectorLayer],
+        
+        // cambia la posicion y zoom inicial de la mapa
+        target: document.getElementById('map'),
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-75, -10]),
+          minZoom: 5,
+          maxZoom:9,
+          zoom: 6
+        })
+      });
+      // hacer el pop-up
+      var element = document.getElementById('popup');
+      
+      var popup = new ol.Overlay({
+        element: element,
+        positioning: 'center-center',
+        stopEvent: false,
+        offset: [0, -10]
+      });
+      map.addOverlay(popup);
+
+      // hacer popup en click
+      map.on('click', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel,
+            function(feature) {
+              return feature;
+            });
+        if (feature) {
+          var coordinates = feature.getGeometry().getCoordinates();
+          var station = feature.get('stationname');
+          var description = feature.get('description');
+          
+          // poner la data del punto en el html
+          // fix this, not efficient
+          // seperate js and html?
+          document.getElementById("test").innerHTML = station;
+          document.getElementById("test1").innerHTML = description;
+
+          var format = document.getElementById('hidden');
+          popup.setPosition(coordinates);
+          $(element).popover({
+            'placement': 'top',
+            'html': true,
+            'content': format
+          });
+          $(element).popover('show');
+        } else {
+          $(element).popover('destroy');
+        }
+      });
+
+      
+      // cambio de cursor al pasar sobre el icono
+      map.on('pointermove', function(e) {
+        if (e.dragging) {
+          $(element).popover('destroy');
+          return;
+        }
+        var pixel = map.getEventPixel(e.originalEvent);
+        var hit = map.hasFeatureAtPixel(pixel);
+        map.getTarget().style.cursor = hit ? 'pointer' : '';
+      });
+
+    </script>
+  </body>
+</html>
